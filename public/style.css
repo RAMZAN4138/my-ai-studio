@@ -1,0 +1,142 @@
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#fff;
+  color:#222;
+  display:flex;
+  height:100vh;
+}
+
+aside{
+  width:260px;
+  background:#f7f7f8;
+  padding:14px;
+  border-right:1px solid #ddd;
+}
+
+aside h2{
+  margin:6px 4px 18px;
+  font-size:19px;
+}
+
+aside button{
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  font-size:14px;
+}
+
+#newChat{
+  width:100%;
+  padding:11px;
+  border:1px solid #ddd;
+  background:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.chat-row{
+  display:flex;
+  gap:4px;
+  margin-top:6px;
+}
+
+.chat-item{
+  flex:1;
+  width:auto;
+  margin:0!important;
+  padding:10px!important;
+  text-align:left!important;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  cursor:pointer;
+}
+
+.chat-item:hover,
+#newChat:hover{
+  background:#e9e9e9;
+}
+
+.delete-chat{
+  width:40px!important;
+  padding:8px!important;
+  cursor:pointer;
+}
+
+main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+
+header{
+  padding:15px;
+  text-align:center;
+  border-bottom:1px solid #ddd;
+  font-weight:bold;
+}
+
+#chat{
+  flex:1;
+  overflow-y:auto;
+  padding:25px 15px;
+  width:100%;
+  max-width:850px;
+  margin:auto;
+}
+
+#chat p{
+  margin:18px 0;
+  padding:12px 15px;
+  line-height:1.5;
+  max-width:85%;
+  border-radius:10px;
+  word-wrap:break-word;
+}
+
+#chat p:nth-child(odd){
+  margin-left:auto;
+  background:#f0f0f0;
+}
+
+#chat p:nth-child(even){
+  background:#fff;
+}
+
+#form{
+  display:flex;
+  gap:8px;
+  padding:12px;
+  border-top:1px solid #ddd;
+  max-width:850px;
+  width:100%;
+  margin:auto;
+}
+
+#message{
+  flex:1;
+  padding:13px 15px;
+  border:1px solid #ccc;
+  border-radius:12px;
+  font-size:16px;
+  outline:none;
+}
+
+#form button{
+  padding:12px 20px;
+  border:0;
+  border-radius:10px;
+  background:#111;
+  color:white;
+  cursor:pointer;
+}
+
+@media(max-width:600px){
+  aside{width:190px}
+  #chat{padding:15px 10px}
+  #form{padding:8px}
+}
