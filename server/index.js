@@ -3,6 +3,7 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const OpenAI = require("openai");
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
 
@@ -12,6 +13,11 @@ app.use(express.static(require("path").join(__dirname, "..", "public")));
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SECRET_KEY
+);
 
 const memoryFile = path.join(__dirname, "memory.json");
 
