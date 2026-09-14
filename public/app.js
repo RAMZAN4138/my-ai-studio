@@ -138,7 +138,12 @@ function addMessage(who, text) {
 
 async function showMemories() {
   try {
-    const r = await fetch("/api/memories");
+    const deviceId = localStorage.getItem("myDeviceId");
+      const r = await fetch("/api/memories", {
+        headers: {
+          "x-device-id": deviceId
+        }
+      });
     const data = await r.json();
 
     const memories = data.memories || [];
@@ -151,7 +156,7 @@ async function showMemories() {
     let text = "🧠 Saved Memories\n\n";
 
     memories.forEach((memory, index) => {
-      text += `${index + 1}. ${memory}\n`;
+      text += `${index + 1}. ${memory.memory}\n`;
     });
 
     text +=
@@ -171,7 +176,7 @@ async function showMemories() {
     ) {
       const ok = window.confirm(
         "Delete this memory?\n\n" +
-        memories[index]
+        memories[index].memory
       );
 
       if (ok) {

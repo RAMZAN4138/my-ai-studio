@@ -21,20 +21,44 @@ const supabase = createClient(
 
 const memoryFile = path.join(__dirname, "memory.json");
 
-function loadMemories() {
-  try {
-    const data = JSON.parse(fs.readFileSync(memoryFile, "utf8"));
-    return Array.isArray(data) ? data : [];
-  } catch {
+async function loadMemories(deviceId) {
+  const { data, error } = await supabase
+    .from("memories")
+    .select("id, memory")
+    .eq("device_id", deviceId)
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error("Supabase load error:", error);
     return [];
+  }
+
+  return data || [];
+}
+
+async function saveMemory(deviceId, memory) {
+  const { error } = await supabase
+    .from("memories")
+    .insert({
+      device_id: deviceId,
+      memory: memory
+    });
+
+  if (error) {
+    console.error("Supabase save error:", error);
   }
 }
 
-function saveMemories(memories) {
-  fs.writeFileSync(
-    memoryFile,
-    JSON.stringify(memories, null, 2)
-  );
+async function deleteMemory(deviceId, id) {
+  const { error } = await supabase
+    .from("memories")
+    .delete()
+    .eq("id", id)
+    .eq("device_id", deviceId);
+
+  if (error) {
+    console.error("Supabase delete error:", error);
+  }
 }
 
 const sensitiveWords = [
@@ -55,33 +79,53 @@ function isSensitive(text) {
   return sensitiveWords.some(word => lower.includes(word));
 }
 
-app.get("/api/memories", (req, res) => {
-  res.json({ memories: loadMemories() });
-});
+app.get("/api/memories", async (req, res) => {
+  const deviceId = req.headers["x-device-id"];
 
-app.delete("/api/memories/:index", (req, res) => {
-  const index = Number(req.params.index);
-  const memories = loadMemories();
-
-  if (
-    !Number.isInteger(index) ||
-    index < 0 ||
-    index >= memories.length
-  ) {
-    return res.status(400).json({
-      error: "Invalid memory"
-    });
+  if (!deviceId) {
+    return res.status(400).json({ error: "Device ID required" });
   }
 
-  memories.splice(index, 1);
-  saveMemories(memories);
+  const memories = await loadMemories(deviceId);
 
-  res.json({ memories });
+  res.json({
+    memories: memories.map(row => ({
+      id: row.id,
+      memory: row.memory
+    }))
+  });
+});
+
+app.delete("/api/memories/:id", async (req, res) => {
+  const deviceId = req.headers["x-device-id"];
+  const id = Number(req.params.id);
+
+  if (!deviceId || !Number.isInteger(id)) {
+    return res.status(400).json({ error: "Invalid memory" });
+  }
+
+  await deleteMemory(deviceId, id);
+
+  const memories = await loadMemories(deviceId);
+
+  res.json({
+    memories: memories.map(row => ({
+      id: row.id,
+      memory: row.memory
+    }))
+  });
 });
 
 app.post("/api/chat", async (req, res) => {
   try {
     const message = String(req.body.message || "").trim();
+    const deviceId = req.headers["x-device-id"];
+
+    if (!deviceId) {
+      return res.status(400).json({
+        error: "Device ID required"
+      });
+    }
 
     const history = Array.isArray(req.body.history)
       ? req.body.history
@@ -104,28 +148,30 @@ app.post("/api/chat", async (req, res) => {
       lower.includes("remember");
 
     if (wantsMemory && !isSensitive(message)) {
-      const memoryText = message
+      const memoryTextToSave = message
         .replace(
           /^(remember|save|yaad rakho|yaad rakhna|save kar lo|save karo)\s*:?\s*/i,
           ""
         )
         .trim();
 
-      if (memoryText) {
-        const memories = loadMemories();
+      if (memoryTextToSave) {
+        const memories = await loadMemories(deviceId);
+        const exists = memories.some(
+          row => row.memory === memoryTextToSave
+        );
 
-        if (!memories.includes(memoryText)) {
-          memories.push(memoryText);
-          saveMemories(memories);
+        if (!exists) {
+          await saveMemory(deviceId, memoryTextToSave);
         }
       }
     }
 
-    const memories = loadMemories();
+    const memories = await loadMemories(deviceId);
 
     const memoryText = memories.length
       ? `Saved memories:\n${memories
-          .map((m, i) => `${i + 1}. ${m}`)
+          .map((m, i) => `${i + 1}. ${m.memory}`)
           .join("\n")}`
       : "Saved memories: None";
 
