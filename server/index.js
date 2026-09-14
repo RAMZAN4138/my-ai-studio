@@ -194,9 +194,11 @@ ${conversation}
 
 User: ${message}
 
-Use saved memories when relevant.
-Do not invent memories.
-If the user asks what you remember, use the saved memories above.`;
+Use the saved memories above as real persistent memories.
+If the user asks what you remember, use the saved memories above.
+If a new memory was saved, confirm that it has been saved.
+Never say that permanent memory is unavailable when saved memories are provided.
+Do not invent memories.`;
 
     const response = await client.responses.create({
       model: process.env.OPENAI_MODEL || "gpt-5.6-luna",
