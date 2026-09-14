@@ -165,6 +165,7 @@ If the user asks what you remember, use the saved memories above.`;
   }
 });
 
+if (require.main === module) {
 app.listen(process.env.PORT || 3000, () => {
   console.log(
     `Running on http://localhost:${process.env.PORT || 3000}`
