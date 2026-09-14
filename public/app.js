@@ -257,8 +257,12 @@ form.addEventListener("submit", async e => {
       {
         method: "POST",
         headers: {
-          "Content-Type":
-            "application/json"
+          "Content-Type": "application/json",
+          "x-device-id": localStorage.getItem("myDeviceId") || (() => {
+            const id = crypto.randomUUID();
+            localStorage.setItem("myDeviceId", id);
+            return id;
+          })()
         },
         body: JSON.stringify({
           message: message,
