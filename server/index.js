@@ -203,7 +203,7 @@ app.post("/api/chat", async (req, res) => {
       lower.includes("save karo") ||
       lower.includes("remember this") ||
       lower.includes("remember") ||
-      /\bmera naam (?:hai|he)\b/i.test(lower) ||
+      /\bmera naam .+?\b(?:hai|he)\b/i.test(lower) ||
       /\bmy name is\b/i.test(lower) ||
       /\bmera favou?rite (?:colour|color|fruit) .+? (?:hai|he)\b/i.test(lower) ||
       /\bmere favou?rite (?:colour|color|fruit) .+? (?:hai|he)\b/i.test(lower);
