@@ -205,8 +205,8 @@ app.post("/api/chat", async (req, res) => {
       lower.includes("remember") ||
       /\bmera naam (?:hai|he)\b/i.test(lower) ||
       /\bmy name is\b/i.test(lower) ||
-      /\bmera favourite (?:colour|color|fruit) .+? (?:hai|he)\b/i.test(lower) ||
-      /\bmere favourite (?:colour|color|fruit) .+? (?:hai|he)\b/i.test(lower);
+      /\bmera favou?rite (?:colour|color|fruit) .+? (?:hai|he)\b/i.test(lower) ||
+      /\bmere favou?rite (?:colour|color|fruit) .+? (?:hai|he)\b/i.test(lower);
 
     if (wantsMemory && !isSensitive(message)) {
       const memoryTextToSave = message
@@ -233,9 +233,9 @@ app.post("/api/chat", async (req, res) => {
 
         if (/\bmera naam\b|\bmy name is\b/i.test(lower)) {
           categoryRegex = /^\s*(mera naam|my name is)\b/i;
-        } else if (/\bfavourite (?:colour|color)\b/i.test(lower)) {
+        } else if (/\bfavou?rite (?:colour|color)\b/i.test(lower)) {
           categoryRegex = /^\s*(mera|mere) favourite (?:colour|color)\b/i;
-        } else if (/\bfavourite fruit\b/i.test(lower)) {
+        } else if (/\bfavou?rite fruit\b/i.test(lower)) {
           categoryRegex = /^\s*(mera|mere) favourite fruit\b/i;
         }
 
