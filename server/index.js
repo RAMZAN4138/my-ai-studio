@@ -218,17 +218,37 @@ app.post("/api/chat", async (req, res) => {
 
       if (memoryTextToSave) {
         if (chatId) {
-        await saveChatMessage(
-          deviceId,
-          chatId,
-          title,
-          "user",
-          message
-        );
-      }
+          await saveChatMessage(
+            deviceId,
+            chatId,
+            title,
+            "user",
+            message
+          );
+        }
 
-      const memories = await loadMemories(deviceId);
-        const exists = memories.some(
+        const memories = await loadMemories(deviceId);
+
+        let categoryRegex = null;
+
+        if (/\bmera naam\b|\bmy name is\b/i.test(lower)) {
+          categoryRegex = /^\s*(mera naam|my name is)\b/i;
+        } else if (/\bfavourite (?:colour|color)\b/i.test(lower)) {
+          categoryRegex = /^\s*(mera|mere) favourite (?:colour|color)\b/i;
+        } else if (/\bfavourite fruit\b/i.test(lower)) {
+          categoryRegex = /^\s*(mera|mere) favourite fruit\b/i;
+        }
+
+        if (categoryRegex) {
+          for (const row of memories) {
+            if (categoryRegex.test(row.memory)) {
+              await deleteMemory(deviceId, row.id);
+            }
+          }
+        }
+
+        const latestMemories = await loadMemories(deviceId);
+        const exists = latestMemories.some(
           row => row.memory === memoryTextToSave
         );
 
