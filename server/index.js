@@ -231,7 +231,7 @@ app.post("/api/chat", async (req, res) => {
 
         let categoryRegex = null;
 
-        if (/\bmera naam\b|\bmy name is\b/i.test(lower)) {
+        if (/\bmera naam\b|\bmy name is\b/i.test(lower) && !/\b(mera naam kya hai|what is my name)\b/i.test(lower)) {
           categoryRegex = /^\s*(mera naam|my name is)\b/i;
         } else if (/\bfavou?rite (?:colour|color)\b/i.test(lower)) {
           categoryRegex = /^\s*(mera|mere) favou?rite (?:colour|color)\b/i;
