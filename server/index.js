@@ -208,7 +208,7 @@ app.post("/api/chat", async (req, res) => {
       /\bmera favou?rite (?:colour|color|fruit) .+? (?:hai|he)\b/i.test(lower) ||
       /\bmere favou?rite (?:colour|color|fruit) .+? (?:hai|he)\b/i.test(lower);
 
-    if (wantsMemory && !isSensitive(message)) {
+    if (wantsMemory && (!isSensitive(message) || /\b(mera naam|my name is)\b/i.test(lower))) {
       const memoryTextToSave = message
         .replace(
           /^(remember|save|yaad rakho|yaad rakhna|save kar lo|save karo)\s*:?\s*/i,
