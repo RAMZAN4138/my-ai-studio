@@ -205,8 +205,8 @@ app.post("/api/chat", async (req, res) => {
       lower.includes("remember") ||
       /\bmera naam (?:hai|he)\b/i.test(lower) ||
       /\bmy name is\b/i.test(lower) ||
-      /\bmera favourite (?:colour|color|fruit) (?:hai|he)\b/i.test(lower) ||
-      /\bmere favourite (?:colour|color|fruit) (?:hai|he)\b/i.test(lower);
+      /\bmera favourite (?:colour|color|fruit) .+? (?:hai|he)\b/i.test(lower) ||
+      /\bmere favourite (?:colour|color|fruit) .+? (?:hai|he)\b/i.test(lower);
 
     if (wantsMemory && !isSensitive(message)) {
       const memoryTextToSave = message
