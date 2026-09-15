@@ -6,6 +6,57 @@ const newChatBtn = document.getElementById("newChat");
 let chats = JSON.parse(localStorage.getItem("myChats") || "[]");
 let currentChat = null;
 
+async function loadChatHistoryFromServer() {
+  try {
+    const deviceId = localStorage.getItem("myDeviceId");
+    if (!deviceId) return;
+
+    const r = await fetch("/api/chat-history", {
+      headers: { "x-device-id": deviceId }
+    });
+
+    const data = await r.json();
+    const rows = data.history || [];
+    if (!rows.length) return;
+
+    const grouped = {};
+
+    rows.forEach(row => {
+      if (!row.chat_id) return;
+
+      if (!grouped[row.chat_id]) {
+        grouped[row.chat_id] = {
+          chatId: row.chat_id,
+          title: row.title || "New Chat",
+          messages: "",
+          history: []
+        };
+      }
+
+      grouped[row.chat_id].history.push({
+        role: row.role,
+        content: row.message
+      });
+
+      const who = row.role === "user" ? "You" : "AI";
+      grouped[row.chat_id].messages +=
+        "<p><b>" + safeText(who) + ":</b> " +
+        safeText(row.message) + "</p>";
+    });
+
+    chats = Object.values(grouped);
+    save();
+    renderSidebar();
+
+    if (chats.length > 0) {
+      currentChat = 0;
+      chat.innerHTML = chats[0].messages || "";
+    }
+  } catch (error) {
+    console.error("Chat history load failed:", error);
+  }
+}
+
 function save() {
   localStorage.setItem("myChats", JSON.stringify(chats));
 }
