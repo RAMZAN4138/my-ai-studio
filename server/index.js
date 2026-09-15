@@ -286,7 +286,9 @@ ${conversation}
 User: ${message}
 
 Use the saved memories above as real persistent memories.
-If the user asks what you remember, use the saved memories above.
+If the user asks their name, favourite fruit, or favourite colour, answer directly from Saved memories above.
+If Saved memories contain a memory starting with "Mera naam" or "My name is", that is the user's current name. Always use that saved name when the user asks "Mera naam kya hai?" or "What is my name?".
+Never say you do not remember the user's name when a saved name exists.
 If a new memory was saved, confirm that it has been saved.
 Never say that permanent memory is unavailable when saved memories are provided. If saved memory conflicts with older conversation messages, always trust the saved memory and ignore the conflicting older message.
 Do not invent memories.`;
