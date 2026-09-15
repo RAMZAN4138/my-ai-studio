@@ -299,7 +299,24 @@ Do not invent memories.`;
       store: false
     });
 
-    const reply = response.output_text || "No response";
+    let reply = response.output_text || "No response";
+
+    if (/\b(mera naam kya hai|what is my name)\b/i.test(lower)) {
+      const savedName = memories.find(m =>
+        /^\s*(mera naam|my name is)\b/i.test(m.memory)
+      );
+
+      if (savedName) {
+        const name = savedName.memory
+          .replace(/^\s*(mera naam|my name is)\s*/i, "")
+          .replace(/\s+(hai|he)\s*$/i, "")
+          .trim();
+
+        if (name) {
+          reply = `Aap ka naam ${name} hai.`;
+        }
+      }
+    }
 
     if (chatId) {
       await saveChatMessage(
