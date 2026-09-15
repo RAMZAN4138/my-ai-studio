@@ -20,6 +20,7 @@ function renderSidebar() {
   document.querySelectorAll(".chat-row").forEach(x => x.remove());
 
   chats.forEach((item, index) => {
+    if (!item.chatId) item.chatId = crypto.randomUUID();
     const row = document.createElement("div");
     row.className = "chat-row";
 
@@ -86,6 +87,7 @@ function renderSidebar() {
 
 function createChat() {
   chats.unshift({
+    chatId: crypto.randomUUID(),
     title: "New Chat",
     messages: "",
     history: []
@@ -266,7 +268,9 @@ form.addEventListener("submit", async e => {
         },
         body: JSON.stringify({
           message: message,
-          history: history
+          history: history,
+          chatId: chats[currentChat].chatId,
+          title: chats[currentChat].title || "New Chat"
         })
       }
     );
