@@ -21,6 +21,37 @@ const supabase = createClient(
 
 const memoryFile = path.join(__dirname, "memory.json");
 
+async function loadChatHistory(deviceId) {
+  const { data, error } = await supabase
+    .from("chat_history")
+    .select("id, chat_id, title, role, message, created_at")
+    .eq("device_id", deviceId)
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error("Chat history load error:", error);
+    return [];
+  }
+
+  return data || [];
+}
+
+async function saveChatMessage(deviceId, chatId, title, role, message) {
+  const { error } = await supabase
+    .from("chat_history")
+    .insert({
+      device_id: deviceId,
+      chat_id: chatId,
+      title: title,
+      role: role,
+      message: message
+    });
+
+  if (error) {
+    console.error("Chat history save error:", error);
+  }
+}
+
 async function loadMemories(deviceId) {
   const { data, error } = await supabase
     .from("memories")
@@ -116,10 +147,36 @@ app.delete("/api/memories/:id", async (req, res) => {
   });
 });
 
+app.get("/api/chat-history", async (req, res) => {
+  try {
+    const deviceId = req.headers["x-device-id"];
+
+    if (!deviceId) {
+      return res.status(400).json({
+        error: "Device ID required"
+      });
+    }
+
+    const history = await loadChatHistory(deviceId);
+
+    res.json({
+      history: history
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      error: error.message || "Server error"
+    });
+  }
+});
+
 app.post("/api/chat", async (req, res) => {
   try {
     const message = String(req.body.message || "").trim();
     const deviceId = req.headers["x-device-id"];
+    const chatId = String(req.body.chatId || "").trim();
+    const title = String(req.body.title || "New Chat").trim();
 
     if (!deviceId) {
       return res.status(400).json({
@@ -156,7 +213,17 @@ app.post("/api/chat", async (req, res) => {
         .trim();
 
       if (memoryTextToSave) {
-        const memories = await loadMemories(deviceId);
+        if (chatId) {
+        await saveChatMessage(
+          deviceId,
+          chatId,
+          title,
+          "user",
+          message
+        );
+      }
+
+      const memories = await loadMemories(deviceId);
         const exists = memories.some(
           row => row.memory === memoryTextToSave
         );
@@ -206,8 +273,20 @@ Do not invent memories.`;
       store: false
     });
 
+    const reply = response.output_text || "No response";
+
+    if (chatId) {
+      await saveChatMessage(
+        deviceId,
+        chatId,
+        title,
+        "assistant",
+        reply
+      );
+    }
+
     res.json({
-      reply: response.output_text || "No response"
+      reply: reply
     });
 
   } catch (error) {
