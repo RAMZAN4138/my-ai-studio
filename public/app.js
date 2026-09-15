@@ -6,6 +6,12 @@ const newChatBtn = document.getElementById("newChat");
 let chats = JSON.parse(localStorage.getItem("myChats") || "[]");
 let currentChat = null;
 
+let deviceId = localStorage.getItem("myDeviceId");
+if (!deviceId) {
+  deviceId = crypto.randomUUID();
+  localStorage.setItem("myDeviceId", deviceId);
+}
+
 async function loadChatHistoryFromServer() {
   try {
     const deviceId = localStorage.getItem("myDeviceId");
