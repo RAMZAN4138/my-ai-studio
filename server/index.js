@@ -234,9 +234,9 @@ app.post("/api/chat", async (req, res) => {
         if (/\bmera naam\b|\bmy name is\b/i.test(lower)) {
           categoryRegex = /^\s*(mera naam|my name is)\b/i;
         } else if (/\bfavou?rite (?:colour|color)\b/i.test(lower)) {
-          categoryRegex = /^\s*(mera|mere) favourite (?:colour|color)\b/i;
+          categoryRegex = /^\s*(mera|mere) favou?rite (?:colour|color)\b/i;
         } else if (/\bfavou?rite fruit\b/i.test(lower)) {
-          categoryRegex = /^\s*(mera|mere) favourite fruit\b/i;
+          categoryRegex = /^\s*(mera|mere) favou?rite fruit\b/i;
         }
 
         if (categoryRegex) {
@@ -288,7 +288,7 @@ User: ${message}
 Use the saved memories above as real persistent memories.
 If the user asks what you remember, use the saved memories above.
 If a new memory was saved, confirm that it has been saved.
-Never say that permanent memory is unavailable when saved memories are provided.
+Never say that permanent memory is unavailable when saved memories are provided. If saved memory conflicts with older conversation messages, always trust the saved memory and ignore the conflicting older message.
 Do not invent memories.`;
 
     const response = await client.responses.create({
